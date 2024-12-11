@@ -9,7 +9,8 @@ def callback_registry(manager_dict, notification_queue):
         for name, callback_info in list(manager_dict.items()):
             if callback_info["active"]:
                 print(f"Notifying client to execute callback: {name}")
-                notification_queue.put(name)  # Notify client to execute callback
+                # Send the callback name and parameters to the notification queue
+                notification_queue.put({"name": name, "params": callback_info.get("params", ())})
                 callback_info["active"] = False
         time.sleep(1)
 
@@ -41,7 +42,7 @@ if __name__ == "__main__":
     
     try:
         while True:
-            time.sleep(2)  # Keep the server running
+            time.sleep(1)  # Keep the server running
     except KeyboardInterrupt:
         print("Shutting down callback server.")
         registry_process.terminate()

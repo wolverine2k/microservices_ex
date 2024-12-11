@@ -5,9 +5,13 @@ import time
 class CallbackManager(BaseManager):
     pass
 
-# Define a function to be called as a callback
-def client_callback():
-    print("Client callback executed in client context.")
+# Define a function to be called as a callback with parameters
+def client1_callback1(param1, param2):
+    print(f"Client1 callback1 executed with parameters: param1={param1}, param2={param2}")
+
+# Define a function to be called as a callback with parameters
+def client1_callback2(param1, param2, param3, param4):
+    print(f"Client1 callback2 executed with parameters: param1={param1}, param2={param2}, param3={param3}, param4={param4}")
 
 if __name__ == "__main__":
     # Register the shared dictionary and queue with the Manager
@@ -22,9 +26,23 @@ if __name__ == "__main__":
     callback_dict = manager.callback_dict()
     notification_queue = manager.notification_queue()
 
-    # Register the callback by name
-    print("Registering client callback.")
-    callback_dict.update({"client_callback": {"active": True}})
+    # Register the callback by name with parameters
+    print("Registering client1 callback1.")
+    callback_dict.update({
+        "client1_callback1": {
+            "active": True,
+            "params": (42, "example")  # Example parameters
+        }
+    })
+
+    # Register the callback by name with parameters
+    print("Registering client2 callback2.")
+    callback_dict.update({
+        "client1_callback2": {
+            "active": True,
+            "params": (42, "example", "param3-111", 100)  # Example parameters
+        }
+    })
 
     # Start listening for notifications
     print("Listening for callback notifications...")
@@ -32,9 +50,14 @@ if __name__ == "__main__":
         while True:
             # Check for notifications from the server
             if not notification_queue.empty():
-                callback_name = notification_queue.get()
-                if callback_name == "client_callback":
-                    client_callback()  # Execute the callback in the client context
+                message = notification_queue.get()
+                callback_name = message.get("name")
+                params = message.get("params", ())
+
+                if callback_name == "client1_callback1":
+                    client1_callback1(*params)  # Execute the callback with parameters
+                elif callback_name == "client1_callback2":
+                    client1_callback2(*params)
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("Shutting down client.")
