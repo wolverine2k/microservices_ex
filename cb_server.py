@@ -12,7 +12,7 @@ def callback_registry(manager_dict, notification_queue):
                 # Send the callback name and parameters to the notification queue
                 notification_queue.put({"name": name, "params": callback_info.get("params", ())})
                 callback_info["active"] = False
-        time.sleep(1)
+        time.sleep(10)
 
 # Define a custom manager class to share the dictionary and queue remotely
 class CallbackManager(BaseManager):
